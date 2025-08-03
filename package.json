@@ -2,13 +2,14 @@
   "name": "goviral",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "seed": "npx prisma db seed"
-  },
+ "scripts": {
+  "dev": "next dev --turbopack",
+  "build": "prisma generate && next build",
+  "start": "next start",
+  "lint": "next lint",
+  "seed": "npx prisma db seed"
+},
+
   "dependencies": {
     "@clerk/nextjs": "^6.25.4",
     "@prisma/client": "^6.12.0",
