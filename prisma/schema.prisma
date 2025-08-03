@@ -1,0 +1,388 @@
+// This is your Prisma schema file
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String          @id @default(cuid())
+  clerkId           String          @unique
+  email             String          @unique
+  name              String?
+  firstName         String?
+  lastName          String?
+  imageUrl          String?
+  role              String          @default("free") // ADD THIS LINE - free, premium, admin
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  // Relations
+  socialAccounts    SocialAccount[]
+  posts             Post[]
+  campaigns         Campaign[]
+  subscription      Subscription?
+  analytics         Analytics[]
+  apiKeys           ApiKey[]
+  platformIntegrations PlatformIntegration[]
+   notifications     Notification[]  // ADD THIS LINE
+  
+  @@map("users")
+}
+
+// ADD THIS ENTIRE MODEL
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  message   String
+  type      String   @default("in-app") // in-app, email, push
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("notifications")
+}
+
+model Plan {
+  id            String          @id @default(cuid())
+  name          String          @unique // Starter, Creator, Agency
+  price         Float           // price in dollars (e.g., 9.00, 29.00, 99.00)
+  description   String?
+  features      String[]
+  maxPosts      Int             @default(10) // Maximum posts per month
+  maxPlatforms  Int             @default(3)  // Maximum platforms per plan
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  
+  // Relations
+  payments      Payment[]
+  subscriptions Subscription[]
+  
+  @@map("plans")
+}
+
+model Payment {
+  id            String          @id @default(cuid())
+  userId        String
+  planId        String
+  reference     String          @unique  // Paystack transaction reference
+  amount        Float           // amount in dollars
+  status        String          // 'pending', 'success', 'failed'
+  paystackData  Json?           // store Paystack response data
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  
+  // Relations
+  plan          Plan            @relation(fields: [planId], references: [id])
+  
+  @@index([userId])
+  @@index([reference])
+  @@map("payments")
+}
+
+model Subscription {
+  id                      String          @id @default(cuid())
+  userId                  String          @unique
+  planId                  String
+  planType                String          // Starter, Creator, Agency
+  status                  String          // trial, active, inactive, cancelled
+  currentPeriodStart      DateTime
+  currentPeriodEnd        DateTime
+  paystackCustomerId      String?
+  paystackSubscriptionId  String?
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+
+  // Relations
+  user                    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                    Plan            @relation(fields: [planId], references: [id])
+
+  @@map("subscriptions")
+}
+
+model SocialAccount {
+  id                String          @id @default(cuid())
+  userId            String
+  platform          String          // facebook, twitter, instagram, tiktok, linkedin
+  accountId         String?         // platform-specific account ID
+  username          String
+  displayName       String
+  profilePicture    String?
+  accessToken       String
+  refreshToken      String?
+  tokenExpiry       DateTime?
+  isActive          Boolean         @default(true)
+  lastSync          DateTime?
+  followerCount     Int?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  // Relations
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  posts             Post[]
+  postResults       PostResult[]
+  
+  @@unique([userId, platform])
+  @@unique([userId, platform, accountId])
+  @@map("social_accounts")
+}
+
+model PlatformIntegration {
+  id                String          @id @default(cuid())
+  userId            String
+  platform          String          // 'facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'tiktok'
+  platformUserId    String          // Platform-specific user ID
+  accountName       String          // Display name or username on the platform
+  accessToken       String
+  refreshToken      String?
+  expiresAt         DateTime?
+  isConnected       Boolean         @default(true) // Updated from isActive to isConnected
+  profileUrl        String?         // URL to the user's profile on the platform
+  profileImageUrl   String?         // URL to the user's profile image
+  connectedAt       DateTime        @default(now()) // When the integration was first connected
+  metadata          Json?           // Store platform-specific data (keeping existing field)
+  isActive     Boolean @default(true)  // Add this line
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  // Relations
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, platform])
+  @@map("platform_integrations")
+}
+
+model Campaign {
+  id             String          @id @default(cuid())
+  userId         String
+  name           String
+  title          String?
+  description    String?
+  budget         Float?
+  targetAudience String?
+  objectives     String[]
+  platforms      String[]
+  startDate      DateTime?
+  endDate        DateTime?
+  contentType    String?
+  hashtags       String[]        @default([])
+  isActive       Boolean         @default(true)
+  status         CampaignStatus  @default(DRAFT) // Changed from String to CampaignStatus
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  
+  // Relations
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  posts          Post[]
+  
+  @@index([userId])
+  @@map("campaigns")
+}
+
+model Post {
+  id                String          @id @default(cuid())
+  userId            String
+  content           String
+  imageUrl          String?
+  videoUrl          String?
+  mediaUrls         String[]        @default([]) // Array of media URLs (added field)
+  scheduledFor      DateTime?
+  scheduledAt       DateTime?       // Alternative field name for scheduling (added field)
+  status            PostStatus      @default(DRAFT)
+  campaignId        String?
+  hashtags          String[]        @default([])
+  platforms         String[]        @default([]) // array of platform names
+  metadata          Json?           // Store platform-specific post data
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  publishedAt       DateTime?
+  
+  // Relations
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaign          Campaign?       @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  socialAccounts    SocialAccount[]
+  postResults       PostResult[]
+  analytics         PostAnalytics[]
+  legacyAnalytics   Analytics[]     // Keep legacy analytics for backward compatibility
+  
+  @@map("posts")
+}
+
+model PostResult {
+  id                String          @id @default(cuid())
+  postId            String
+  socialAccountId   String
+  externalId        String?         // ID from the social platform
+  status            PublishStatus   @default(PENDING)
+  error             String?
+  publishedAt       DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  // Relations
+  post              Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  socialAccount     SocialAccount   @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+  
+  @@unique([postId, socialAccountId])
+  @@map("post_results")
+}
+
+model PostAnalytics {
+  id                String          @id @default(cuid())
+  postId            String
+  platform          String
+  impressions       Int             @default(0)
+  engagements       Int             @default(0)
+  likes             Int             @default(0)
+  comments          Int             @default(0)
+  shares            Int             @default(0)
+  clicks            Int             @default(0)
+  reach             Int             @default(0)
+  saves             Int             @default(0)
+  recordedAt        DateTime        @default(now())
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  // Relations
+  post              Post            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  @@unique([postId, platform, recordedAt])
+  @@map("post_analytics")
+}
+
+model Analytics {
+  id          String          @id @default(cuid())
+  userId      String
+  postId      String?
+  platform    String
+  metric      String          // likes, shares, comments, views, reach, impressions
+  value       Int
+  date        DateTime        @default(now())
+  createdAt   DateTime        @default(now())
+
+  // Relations
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post        Post?           @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("analytics")
+}
+
+model ScheduledTask {
+  id                String          @id @default(cuid())
+  type              TaskType
+  payload           Json
+  scheduledFor      DateTime
+  status            TaskStatus      @default(PENDING)
+  attempts          Int             @default(0)
+  maxAttempts       Int             @default(3)
+  lastAttempt       DateTime?
+  error             String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  @@map("scheduled_tasks")
+}
+
+model ApiKey {
+  id                String          @id @default(cuid())
+  userId            String
+  name              String
+  key               String          @unique
+  permissions       String[]        @default([])
+  isActive          Boolean         @default(true)
+  lastUsed          DateTime?
+  expiresAt         DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  // Relations
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("api_keys")
+}
+
+model AuditLog {
+  id                String          @id @default(cuid())
+  userId            String?
+  action            String
+  resource          String
+  resourceId        String?
+  details           Json?
+  ipAddress         String?
+  userAgent         String?
+  createdAt         DateTime        @default(now())
+  
+  @@map("audit_logs")
+}
+
+model BlogPost {
+  id          String          @id @default(cuid())
+  title       String
+  slug        String          @unique
+  excerpt     String
+  content     String
+  category    String
+  readTime    String
+  published   Boolean         @default(false)
+  featured    Boolean         @default(false)
+  imageUrl    String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@map("blog_posts")
+}
+
+model WaitlistUser {
+  id        String          @id @default(cuid())
+  email     String          @unique
+  firstName String?
+  lastName  String?
+  createdAt DateTime        @default(now())
+
+  @@map("waitlist_users")
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  FAILED
+  CANCELLED
+}
+
+enum PublishStatus {
+  PENDING
+  PUBLISHED
+  FAILED
+  CANCELLED
+}
+
+enum TaskType {
+  PUBLISH_POST
+  REFRESH_TOKEN
+  FETCH_ANALYTICS
+  CLEANUP_EXPIRED_TOKENS
+}
+
+enum TaskStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  PAUSED
+}

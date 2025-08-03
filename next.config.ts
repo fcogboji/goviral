@@ -1,7 +1,14 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    // Allow SVG images to be processed
+    dangerouslyAllowSVG: true,
+    // Optional: Add content security policy for SVG
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // If you're using external domains, add them here
+    // domains: ['example.com'],
+  },
+  // Other config options...
 };
 
-export default nextConfig;
+module.exports = nextConfig;
