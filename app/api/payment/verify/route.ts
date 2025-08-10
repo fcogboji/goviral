@@ -5,6 +5,8 @@ import { NextRequest, NextResponse } from 'next/server' // Next.js 13+ App Route
 import PaystackAPI from '@/lib/paystack' // Custom Paystack API wrapper class
 import { prisma, Prisma } from '@/lib/prisma' // Prisma database client instance
 
+export const runtime = 'nodejs'
+
 // POST endpoint to verify a payment transaction
 export async function POST(request: NextRequest) {
   try {
