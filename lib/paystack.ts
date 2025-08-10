@@ -71,7 +71,7 @@ export default class PaystackAPI {
   // Fixed method that handles optional parameters properly
   async initializeTransaction(data: {
     email: string;
-    amount: number;
+    amount: number; // amount in dollars
     reference?: string;
     callback_url?: string;
     metadata?: Record<string, unknown>;
@@ -82,10 +82,13 @@ export default class PaystackAPI {
     // Generate callback URL if not provided
     const callback_url = data.callback_url || `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/payment/callback`;
 
+    // Convert dollars to kobo (Paystack expects amount in kobo)
+    const amountInKobo = Math.round(Number.isFinite(data.amount) ? data.amount * 100 : 0);
+
     // Create properly typed data for initializePayment
     const paymentData = {
       email: data.email,
-      amount: data.amount,
+      amount: amountInKobo,
       reference,
       callback_url,
       metadata: data.metadata

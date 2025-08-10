@@ -6,8 +6,7 @@ import { prisma } from '@/lib/prisma'
 export async function GET(request: NextRequest) {
   console.log('🔍 Analytics API called:', request.url)
   console.log('🔍 Request method:', request.method)
-  console.log('🔍 Headers:', Object.fromEntries(request.headers.entries()))
-  
+
   try {
     console.log('🔍 Attempting authentication...')
     const { userId } = await auth()

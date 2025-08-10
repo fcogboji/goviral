@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       user = await prisma.user.create({
         data: {
           clerkId: userId,
-          email: '', // Will be updated when we have the email
+          email: `temp_${userId}@clerk.temp`, // Will be updated when we have the email
           createdAt: new Date(),
           updatedAt: new Date()
         }

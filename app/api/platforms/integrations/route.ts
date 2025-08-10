@@ -16,7 +16,7 @@ export async function GET() {
       where: { clerkId: userId },
       create: {
         clerkId: userId,
-        email: '',
+        email: `temp_${userId}@clerk.temp`,
         createdAt: new Date()
       },
       update: {},
