@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
       where: { clerkId: userId },
       create: {
         clerkId: userId,
-        email: '',
+        email: `temp_${userId}@clerk.temp`,
         createdAt: new Date()
       },
       update: {}
