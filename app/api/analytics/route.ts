@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 
+export const runtime = 'nodejs'
+
 // GET - Fetch analytics data
 export async function GET(request: NextRequest) {
   console.log('🔍 Analytics API called:', request.url)

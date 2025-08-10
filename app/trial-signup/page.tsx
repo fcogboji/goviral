@@ -1,6 +1,8 @@
 // app/trial-signup/page.tsx
 "use client"
 
+export const dynamic = 'force-dynamic'
+
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter, useSearchParams } from 'next/navigation';

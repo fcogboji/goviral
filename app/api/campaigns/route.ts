@@ -3,6 +3,8 @@ import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 // Removed unused PostStatus import
 
+export const runtime = 'nodejs'
+
 // If CampaignStatus is not exported, define it manually or use Prisma's $Enums
 // Option 1: Use Prisma's $Enums (recommended)
 import type { $Enums } from '@prisma/client'

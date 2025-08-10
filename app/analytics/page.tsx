@@ -2,6 +2,8 @@ import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import Analytics from '@/components/Analytics'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AnalyticsPage() {
   const { userId } = await auth()
   

@@ -3,6 +3,8 @@ import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
 import { PostStatus } from '@prisma/client'
 
+export const runtime = 'nodejs'
+
 // GET - Fetch all posts for the authenticated user
 export async function GET(request: NextRequest) {
   try {

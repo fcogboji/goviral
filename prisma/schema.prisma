@@ -30,7 +30,8 @@ model User {
   analytics         Analytics[]
   apiKeys           ApiKey[]
   platformIntegrations PlatformIntegration[]
-   notifications     Notification[]  // ADD THIS LINE
+  notifications     Notification[]  // ADD THIS LINE
+  reviews           Review[]
   
   @@map("users")
 }
@@ -348,6 +349,23 @@ model WaitlistUser {
   createdAt DateTime        @default(now())
 
   @@map("waitlist_users")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String?
+  name      String
+  role      String?
+  content   String
+  rating    Int      @default(5)
+  approved  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("reviews")
 }
 
 enum PostStatus {
