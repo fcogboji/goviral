@@ -177,19 +177,7 @@ export default function GoViralLanding() {
     }).catch(error => console.error('Analytics error:', error));
   };
 
-  const handleTestimonialClick = (testimonialId: string) => {
-    fetch('/api/analytics/testimonial-click', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        testimonial_id: testimonialId,
-        source: 'testimonials_section',
-        timestamp: new Date().toISOString()
-      })
-    }).catch(error => console.error('Analytics error:', error));
-  };
+
 
   const handleNewsletterSignup = async (email: string) => {
     if (!email) return;
@@ -260,9 +248,7 @@ export default function GoViralLanding() {
         onPlanSelection={handlePlanSelection} 
       />
       
-      <Testimonials 
-        onTestimonialClick={handleTestimonialClick} 
-      />
+      <Testimonials />
       
       <Blog 
         onBlogClick={handleBlogClick} 
