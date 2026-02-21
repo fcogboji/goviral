@@ -18,10 +18,15 @@ model User {
   firstName         String?
   lastName          String?
   imageUrl          String?
-  role              String          @default("free") // ADD THIS LINE - free, premium, admin
+  role              String          @default("free") // free, premium, admin
+  isBlocked         Boolean         @default(false)
+  blockedAt         DateTime?
+  blockedReason     String?
+  blockedBy         String?         // Admin user ID who blocked
+  ayrshareProfileKey String?
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
-  
+
   // Relations
   socialAccounts    SocialAccount[]
   posts             Post[]
@@ -52,37 +57,50 @@ model Notification {
 }
 
 model Plan {
-  id            String          @id @default(cuid())
-  name          String          @unique // Starter, Creator, Agency
-  price         Float           // price in dollars (e.g., 9.00, 29.00, 99.00)
-  description   String?
-  features      String[]
-  maxPosts      Int             @default(10) // Maximum posts per month
-  maxPlatforms  Int             @default(3)  // Maximum platforms per plan
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  
+  id                    String          @id @default(cuid())
+  name                  String          @unique
+  price                 Float           // USD monthly
+  priceNGN              Float?          // NGN monthly
+  priceGBP              Float?          // GBP monthly
+  yearlyMonthlyPrice    Float?          // USD monthly when billed yearly
+  yearlyMonthlyPriceNGN Float?
+  yearlyMonthlyPriceGBP Float?
+  currency              String          @default("USD")
+  description           String?
+  features              String[]
+  maxPosts              Int             @default(10) // -1 = unlimited
+  maxPlatforms          Int             @default(3)  // -1 = unlimited
+  maxWhatsAppMessages   Int             @default(0)
+  stripePriceId         String?
+  trialDays             Int             @default(7)
+  sortOrder             Int             @default(0)  // Display order on pricing page
+  isActive              Boolean         @default(true)
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
   // Relations
   payments      Payment[]
   subscriptions Subscription[]
-  
+
   @@map("plans")
 }
 
 model Payment {
-  id            String          @id @default(cuid())
-  userId        String
-  planId        String
-  reference     String          @unique  // Paystack transaction reference
-  amount        Float           // amount in dollars
-  status        String          // 'pending', 'success', 'failed'
-  paystackData  Json?           // store Paystack response data
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  
+  id                String          @id @default(cuid())
+  userId            String
+  planId            String?
+  reference         String          @unique  // Transaction reference
+  amount            Float           // amount in USD
+  currency          String          @default("USD") // Currency code
+  status            String          // 'pending', 'success', 'failed'
+  stripeSessionId   String?         // Stripe Checkout Session ID
+  stripePaymentIntentId String?     // Stripe Payment Intent ID
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
   // Relations
-  plan          Plan            @relation(fields: [planId], references: [id])
-  
+  plan              Plan?           @relation(fields: [planId], references: [id])
+
   @@index([userId])
   @@index([reference])
   @@map("payments")
@@ -93,11 +111,19 @@ model Subscription {
   userId                  String          @unique
   planId                  String
   planType                String          // Starter, Creator, Agency
-  status                  String          // trial, active, inactive, cancelled
+  status                  String          // trial, active, inactive, cancelled, past_due
   currentPeriodStart      DateTime
   currentPeriodEnd        DateTime
-  paystackCustomerId      String?
-  paystackSubscriptionId  String?
+  trialEndsAt             DateTime?       // When the trial period ends
+  cancelAtPeriodEnd       Boolean         @default(false)
+  stripeCustomerId        String?         // Stripe Customer ID / Paystack customer_code
+  stripeSubscriptionId    String?         // Stripe Subscription ID / Paystack subscription_code
+  paystackAuthCode        String?         // Paystack authorization code for recurring charges
+  cardLast4               String?         // Last 4 digits of card
+  cardBrand               String?         // Card brand (Visa, Mastercard, etc.)
+  cardExpMonth            String?         // Card expiry month
+  cardExpYear             String?         // Card expiry year
+  nextBillingDate         DateTime?       // Next billing date
   createdAt               DateTime        @default(now())
   updatedAt               DateTime        @updatedAt
 
@@ -111,7 +137,7 @@ model Subscription {
 model SocialAccount {
   id                String          @id @default(cuid())
   userId            String
-  platform          String          // facebook, twitter, instagram, tiktok, linkedin
+  platform          String          // facebook, twitter, instagram, tiktok, linkedin, whatsapp, youtube
   accountId         String?         // platform-specific account ID
   username          String
   displayName       String
@@ -122,14 +148,16 @@ model SocialAccount {
   isActive          Boolean         @default(true)
   lastSync          DateTime?
   followerCount     Int?
+  phoneNumber       String?         // For WhatsApp Business API
+  businessAccountId String?         // For WhatsApp/Facebook Business
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
-  
+
   // Relations
   user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   posts             Post[]
   postResults       PostResult[]
-  
+
   @@unique([userId, platform])
   @@unique([userId, platform, accountId])
   @@map("social_accounts")
@@ -138,7 +166,7 @@ model SocialAccount {
 model PlatformIntegration {
   id                String          @id @default(cuid())
   userId            String
-  platform          String          // 'facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'tiktok'
+  platform          String          // 'facebook', 'twitter', 'instagram', 'linkedin', 'youtube', 'tiktok', 'whatsapp'
   platformUserId    String          // Platform-specific user ID
   accountName       String          // Display name or username on the platform
   accessToken       String
@@ -148,8 +176,10 @@ model PlatformIntegration {
   profileUrl        String?         // URL to the user's profile on the platform
   profileImageUrl   String?         // URL to the user's profile image
   connectedAt       DateTime        @default(now()) // When the integration was first connected
-  metadata          Json?           // Store platform-specific data (keeping existing field)
-  isActive     Boolean @default(true)  // Add this line
+  metadata          Json?           // Store platform-specific data (WhatsApp: phoneNumberId, businessAccountId)
+  isActive          Boolean         @default(true)
+  phoneNumber       String?         // For WhatsApp Business
+  businessAccountId String?         // For WhatsApp/Facebook Business
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
 
@@ -348,6 +378,36 @@ model WaitlistUser {
   createdAt DateTime        @default(now())
 
   @@map("waitlist_users")
+}
+
+model DemoVideo {
+  id          String          @id @default(cuid())
+  title       String
+  description String?
+  youtubeUrl  String          // YouTube video URL or embed ID
+  thumbnailUrl String?
+  isActive    Boolean         @default(true)
+  order       Int             @default(0) // For ordering multiple videos
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@map("demo_videos")
+}
+
+model DemoRequest {
+  id              String          @id @default(cuid())
+  name            String
+  email           String
+  phone           String?
+  company         String?
+  preferredDate   DateTime?
+  preferredTime   String?
+  message         String?
+  status          String          @default("pending") // pending, scheduled, completed, cancelled
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@map("demo_requests")
 }
 
 enum PostStatus {
