@@ -26,6 +26,8 @@ export default function Navigation({
   const { isSignedIn, user } = useUser();
   const { signOut } = useClerk();
 
+  const closeMobileMenu = () => setIsMenuOpen(false)
+
   const handleAuthAction = () => {
     if (isSignedIn) {
       window.location.href = '/dashboard';
@@ -180,20 +182,20 @@ export default function Navigation({
         {isMenuOpen && (
           <div className="md:hidden bg-gray-900/95 backdrop-blur-xl rounded-2xl mt-2 mb-4 border border-gray-800 shadow-2xl overflow-hidden">
             <div className="p-4 space-y-1">
-              <a href="#features" className="block text-gray-300 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-xl text-sm font-medium transition-colors">
+              <a href="#features" onClick={closeMobileMenu} className="block text-gray-300 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-xl text-sm font-medium transition-colors">
                 Features
               </a>
-              <a href="#platforms" className="block text-gray-300 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-xl text-sm font-medium transition-colors">
+              <a href="#platforms" onClick={closeMobileMenu} className="block text-gray-300 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-xl text-sm font-medium transition-colors">
                 Platforms
               </a>
-              <a href="#pricing" className="block text-gray-300 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-xl text-sm font-medium transition-colors">
+              <a href="#pricing" onClick={closeMobileMenu} className="block text-gray-300 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-xl text-sm font-medium transition-colors">
                 Pricing
               </a>
-              <a href="#testimonials" className="block text-gray-300 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-xl text-sm font-medium transition-colors">
+              <a href="#testimonials" onClick={closeMobileMenu} className="block text-gray-300 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-xl text-sm font-medium transition-colors">
                 Results
               </a>
               <button
-                onClick={onContactSupport}
+                onClick={() => { closeMobileMenu(); onContactSupport(); }}
                 className="block w-full text-left text-gray-300 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-xl text-sm font-medium transition-colors"
               >
                 Support

@@ -43,8 +43,13 @@ export async function GET() {
       }
     })
 
-    // Get user's plan limits
-    const maxPlatforms = user.subscription?.plan?.maxPlatforms || 5
+    // Check if user is admin (admins get unlimited platforms)
+    const userRecord = await prisma.user.findUnique({ where: { clerkId: userId }, select: { role: true } })
+    const isAdmin = userRecord?.role === 'admin'
+
+    // Get user's plan limits; admins get unlimited
+    const rawMax = user.subscription?.plan?.maxPlatforms ?? 5
+    const maxPlatforms = isAdmin ? -1 : (typeof rawMax === 'number' ? rawMax : 5)
     const connectedCount = user.platformIntegrations.filter(p => p.isConnected).length
 
     // Transform integrations to match component expected format
@@ -89,12 +94,14 @@ export async function GET() {
       }
     })
 
+    const remaining = maxPlatforms === -1 ? -1 : Math.max(0, maxPlatforms - connectedCount)
+
     return NextResponse.json({
       platforms,
       limits: {
         maxPlatforms,
         used: connectedCount,
-        remaining: maxPlatforms - connectedCount
+        remaining
       }
     })
   } catch (error) {

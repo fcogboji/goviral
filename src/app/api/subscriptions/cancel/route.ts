@@ -3,6 +3,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@/lib/prisma'
+import { cancelSubscription as cancelStripeSubscription } from '@/lib/stripe'
 
 export async function POST() {
   try {
@@ -47,6 +48,16 @@ export async function POST() {
           currentPeriodEnd: sub.currentPeriodEnd,
         }
       })
+    }
+
+    // If Stripe subscription exists, cancel at period end in Stripe first
+    if (sub.stripeSubscriptionId && process.env.STRIPE_SECRET_KEY) {
+      try {
+        await cancelStripeSubscription(sub.stripeSubscriptionId, true)
+      } catch (stripeErr) {
+        console.error('Stripe cancel error (continuing with DB update):', stripeErr)
+        // Still update DB so user's cancel intent is recorded
+      }
     }
 
     // Mark as cancel-at-period-end — user keeps access until currentPeriodEnd / trialEndsAt

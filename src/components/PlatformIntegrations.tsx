@@ -89,7 +89,7 @@ export default function PlatformIntegrations() {
           color: 'bg-gradient-to-r from-purple-500 to-pink-500',
           isConnected: data.platforms.find((p) => p.name === 'instagram')?.isConnected || false,
           isActive: data.platforms.find((p) => p.name === 'instagram')?.isActive || false,
-          canConnect: data.limits.remaining > 0 || data.platforms.find((p) => p.name === 'instagram')?.isConnected || false,
+          canConnect: (data.limits.remaining > 0 || data.limits.remaining === -1) || data.platforms.find((p) => p.name === 'instagram')?.isConnected || false,
           accountInfo: data.platforms.find((p) => p.name === 'instagram')?.accountInfo,
           lastSync: data.platforms.find((p) => p.name === 'instagram')?.lastSync,
           error: data.platforms.find((p) => p.name === 'instagram')?.error
@@ -101,7 +101,7 @@ export default function PlatformIntegrations() {
           color: 'bg-gradient-to-r from-blue-500 to-blue-600',
           isConnected: data.platforms.find((p) => p.name === 'facebook')?.isConnected || false,
           isActive: data.platforms.find((p) => p.name === 'facebook')?.isActive || false,
-          canConnect: data.limits.remaining > 0 || data.platforms.find((p) => p.name === 'facebook')?.isConnected || false,
+          canConnect: (data.limits.remaining > 0 || data.limits.remaining === -1) || data.platforms.find((p) => p.name === 'facebook')?.isConnected || false,
           accountInfo: data.platforms.find((p) => p.name === 'facebook')?.accountInfo,
           lastSync: data.platforms.find((p) => p.name === 'facebook')?.lastSync,
           error: data.platforms.find((p) => p.name === 'facebook')?.error
@@ -113,7 +113,7 @@ export default function PlatformIntegrations() {
           color: 'bg-gradient-to-r from-blue-400 to-blue-500',
           isConnected: data.platforms.find((p) => p.name === 'twitter')?.isConnected || false,
           isActive: data.platforms.find((p) => p.name === 'twitter')?.isActive || false,
-          canConnect: data.limits.remaining > 0 || data.platforms.find((p) => p.name === 'twitter')?.isConnected || false,
+          canConnect: (data.limits.remaining > 0 || data.limits.remaining === -1) || data.platforms.find((p) => p.name === 'twitter')?.isConnected || false,
           accountInfo: data.platforms.find((p) => p.name === 'twitter')?.accountInfo,
           lastSync: data.platforms.find((p) => p.name === 'twitter')?.lastSync,
           error: data.platforms.find((p) => p.name === 'twitter')?.error
@@ -125,7 +125,7 @@ export default function PlatformIntegrations() {
           color: 'bg-gradient-to-r from-blue-600 to-blue-700',
           isConnected: data.platforms.find((p) => p.name === 'linkedin')?.isConnected || false,
           isActive: data.platforms.find((p) => p.name === 'linkedin')?.isActive || false,
-          canConnect: data.limits.remaining > 0 || data.platforms.find((p) => p.name === 'linkedin')?.isConnected || false,
+          canConnect: (data.limits.remaining > 0 || data.limits.remaining === -1) || data.platforms.find((p) => p.name === 'linkedin')?.isConnected || false,
           accountInfo: data.platforms.find((p) => p.name === 'linkedin')?.accountInfo,
           lastSync: data.platforms.find((p) => p.name === 'linkedin')?.lastSync,
           error: data.platforms.find((p) => p.name === 'linkedin')?.error
@@ -137,7 +137,7 @@ export default function PlatformIntegrations() {
           color: 'bg-gradient-to-r from-black to-gray-800',
           isConnected: data.platforms.find((p) => p.name === 'tiktok')?.isConnected || false,
           isActive: data.platforms.find((p) => p.name === 'tiktok')?.isActive || false,
-          canConnect: data.limits.remaining > 0 || data.platforms.find((p) => p.name === 'tiktok')?.isConnected || false,
+          canConnect: (data.limits.remaining > 0 || data.limits.remaining === -1) || data.platforms.find((p) => p.name === 'tiktok')?.isConnected || false,
           accountInfo: data.platforms.find((p) => p.name === 'tiktok')?.accountInfo,
           lastSync: data.platforms.find((p) => p.name === 'tiktok')?.lastSync,
           error: data.platforms.find((p) => p.name === 'tiktok')?.error
@@ -149,7 +149,7 @@ export default function PlatformIntegrations() {
           color: 'bg-gradient-to-r from-red-500 to-red-600',
           isConnected: data.platforms.find((p) => p.name === 'youtube')?.isConnected || false,
           isActive: data.platforms.find((p) => p.name === 'youtube')?.isActive || false,
-          canConnect: data.limits.remaining > 0 || data.platforms.find((p) => p.name === 'youtube')?.isConnected || false,
+          canConnect: (data.limits.remaining > 0 || data.limits.remaining === -1) || data.platforms.find((p) => p.name === 'youtube')?.isConnected || false,
           accountInfo: data.platforms.find((p) => p.name === 'youtube')?.accountInfo,
           lastSync: data.platforms.find((p) => p.name === 'youtube')?.lastSync,
           error: data.platforms.find((p) => p.name === 'youtube')?.error
@@ -243,11 +243,11 @@ export default function PlatformIntegrations() {
           : platform
       ))
       
-      // Update limits
+      // Update limits (remaining is -1 for unlimited)
       setLimits(prev => ({
         ...prev,
         used: prev.used - 1,
-        remaining: prev.remaining + 1
+        remaining: prev.remaining === -1 ? -1 : prev.remaining + 1
       }))
     } catch (error) {
       console.error(`Failed to disconnect ${platformName}:`, error)
@@ -339,12 +339,12 @@ export default function PlatformIntegrations() {
           <div>
             <h3 className="text-sm font-medium text-blue-900">Platform Limits</h3>
             <p className="text-sm text-blue-700">
-              {limits.used} of {limits.maxPlatforms} platforms connected
+              {limits.used} of {limits.maxPlatforms === -1 ? '∞' : limits.maxPlatforms} platforms connected
             </p>
           </div>
           <div className="text-right">
-            <p className="text-sm font-medium text-blue-900">{limits.remaining} remaining</p>
-            <p className="text-xs text-blue-600">Upgrade plan for more</p>
+            <p className="text-sm font-medium text-blue-900">{limits.remaining === -1 ? 'Unlimited' : `${limits.remaining} remaining`}</p>
+            {limits.maxPlatforms !== -1 && <p className="text-xs text-blue-600">Upgrade plan for more</p>}
           </div>
         </div>
       </div>

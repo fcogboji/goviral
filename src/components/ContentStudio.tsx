@@ -111,15 +111,32 @@ export default function ContentStudio() {
     setCurrentTime(0)
   }
 
+  // Simulate playback when no real video (template uses image) - update timer dynamically
+  useEffect(() => {
+    if (!isPlaying || !selectedTemplate) return
+    const interval = setInterval(() => {
+      setCurrentTime((t) => {
+        if (t >= duration) {
+          setIsPlaying(false)
+          return duration
+        }
+        return Math.min(t + 0.1, duration)
+      })
+    }, 100)
+    return () => clearInterval(interval)
+  }, [isPlaying, duration, selectedTemplate])
+
   const handlePlayPause = () => {
-    if (videoRef.current) {
+    if (videoRef.current?.tagName === 'VIDEO') {
       if (isPlaying) {
         videoRef.current.pause()
       } else {
         videoRef.current.play()
       }
-      setIsPlaying(!isPlaying)
     }
+    if (!selectedTemplate) return
+    if (isPlaying && currentTime >= duration) setCurrentTime(0)
+    setIsPlaying(!isPlaying)
   }
 
   const addElement = (type: VideoElement['type']) => {

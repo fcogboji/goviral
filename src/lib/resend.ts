@@ -1,7 +1,8 @@
 // /lib/resend.ts
 import { Resend } from "resend";
 
-export const resend = new Resend(process.env.RESEND_API_KEY);
+const apiKey = process.env.RESEND_API_KEY;
+export const resend = apiKey ? new Resend(apiKey) : null;
 
 // Email data interface
 interface EmailData {
@@ -29,6 +30,9 @@ interface PostData {
 
 // Generic email sending function
 export async function sendEmail(data: EmailData) {
+  if (!resend) {
+    throw new Error('Email service not configured. Set RESEND_API_KEY.');
+  }
   return await resend.emails.send({
     from: data.from || "noreply@goviral.com",
     to: data.to,
