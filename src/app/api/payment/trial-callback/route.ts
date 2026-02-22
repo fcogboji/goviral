@@ -1,6 +1,7 @@
 // Callback for trial card authorization
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getAppUrl } from '@/lib/app-url';
 import PaystackAPI from '@/lib/paystack';
 import { getPlanByName } from '@/lib/plan-features';
 
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest) {
 
     if (!reference) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/pricing?error=invalid_reference`
+        `${getAppUrl()}/pricing?error=invalid_reference`
       );
     }
 
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
       });
 
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/pricing?error=payment_failed`
+        `${getAppUrl()}/pricing?error=payment_failed`
       );
     }
 
@@ -66,14 +67,14 @@ export async function GET(request: NextRequest) {
       });
 
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/pricing?error=payment_failed`
+        `${getAppUrl()}/pricing?error=payment_failed`
       );
     }
 
     // Check if authorization is reusable
     if (!paymentData.authorization.reusable) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/pricing?error=card_not_reusable`
+        `${getAppUrl()}/pricing?error=card_not_reusable`
       );
     }
 
@@ -92,7 +93,7 @@ export async function GET(request: NextRequest) {
 
     if (!planConfig) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/pricing?error=invalid_plan`
+        `${getAppUrl()}/pricing?error=invalid_plan`
       );
     }
 
@@ -151,12 +152,12 @@ export async function GET(request: NextRequest) {
     // await sendTrialWelcomeEmail(user.email, planName, trialEndsAt);
 
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?trial_started=true&plan=${planName}`
+      `${getAppUrl()}/dashboard?trial_started=true&plan=${planName}`
     );
   } catch (error) {
     console.error('Error processing trial callback:', error);
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/pricing?error=processing_failed`
+      `${getAppUrl()}/pricing?error=processing_failed`
     );
   }
 }

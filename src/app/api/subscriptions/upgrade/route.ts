@@ -11,6 +11,7 @@ import {
   isPaystackConfigured,
   type PaymentProvider,
 } from '@/lib/payment-provider';
+import { getAppUrl } from '@/lib/app-url';
 
 export async function POST(request: NextRequest) {
   try {
@@ -134,7 +135,6 @@ export async function POST(request: NextRequest) {
           email: user.email,
           amount: amountInKobo,
           reference,
-          callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/upgrade-callback`,
           metadata: {
             userId: user.id,
             subscriptionId: user.subscription.id,
@@ -178,8 +178,8 @@ export async function POST(request: NextRequest) {
       amount: amountInCents,
       currency: 'usd',
       customerEmail: user.email,
-      successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/payment/upgrade-callback?session_id={CHECKOUT_SESSION_ID}&plan=${newPlanName}&provider=stripe`,
-      cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/settings?canceled=true`,
+      successUrl: `${getAppUrl()}/payment/upgrade-callback?session_id={CHECKOUT_SESSION_ID}&plan=${newPlanName}&provider=stripe`,
+      cancelUrl: `${getAppUrl()}/dashboard/settings?canceled=true`,
       metadata: {
         userId: user.id,
         subscriptionId: user.subscription.id,

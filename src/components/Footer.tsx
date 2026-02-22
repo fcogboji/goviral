@@ -2,6 +2,7 @@
 "use client"
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { Sparkles, ArrowRight } from 'lucide-react';
 
 interface FooterProps {
@@ -97,9 +98,9 @@ export default function Footer({ onContactSupport, onNewsletterSignup }: FooterP
           <div>
             <h4 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-4">Legal</h4>
             <ul className="space-y-3 text-sm text-gray-500">
-              <li><a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#terms" className="hover:text-white transition-colors">Terms of Service</a></li>
-              <li><a href="#cookies" className="hover:text-white transition-colors">Cookie Policy</a></li>
+              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
+              <li><Link href="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link></li>
             </ul>
           </div>
         </div>

@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server' // Next.js 13+ App Router types
 import { auth } from '@clerk/nextjs/server' // Clerk authentication for server components
 import { createCheckoutSession } from '@/lib/stripe' // Stripe checkout session helper
+import { getAppUrl } from '@/lib/app-url'
 import { prisma } from '@/lib/prisma' // Prisma database client instance
 import { getPlanFeatures } from '@/lib/plan-features' // Plan features helper
 
@@ -51,8 +52,8 @@ export async function POST(request: NextRequest) {
       amount: amountInCents,
       currency: 'usd',
       customerEmail: email,
-      successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?canceled=true`,
+      successUrl: `${getAppUrl()}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancelUrl: `${getAppUrl()}/pricing?canceled=true`,
       metadata: {
         userId,
         planName,

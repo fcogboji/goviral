@@ -1,6 +1,7 @@
 // Callback for subscription upgrade payments
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getAppUrl } from '@/lib/app-url';
 import PaystackAPI from '@/lib/paystack';
 import { getPlanByName } from '@/lib/plan-features';
 
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest) {
 
     if (!reference) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=invalid_reference`
+        `${getAppUrl()}/dashboard?error=invalid_reference`
       );
     }
 
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
       });
 
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=payment_failed`
+        `${getAppUrl()}/dashboard?error=payment_failed`
       );
     }
 
@@ -57,7 +58,7 @@ export async function GET(request: NextRequest) {
       });
 
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=payment_failed`
+        `${getAppUrl()}/dashboard?error=payment_failed`
       );
     }
 
@@ -68,7 +69,7 @@ export async function GET(request: NextRequest) {
 
     if (!newPlanConfig) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=invalid_plan`
+        `${getAppUrl()}/dashboard?error=invalid_plan`
       );
     }
 
@@ -124,12 +125,12 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?upgrade_success=true&plan=${newPlan}`
+      `${getAppUrl()}/dashboard?upgrade_success=true&plan=${newPlan}`
     );
   } catch (error) {
     console.error('Error processing upgrade callback:', error);
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=processing_failed`
+      `${getAppUrl()}/dashboard?error=processing_failed`
     );
   }
 }

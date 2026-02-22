@@ -1,6 +1,7 @@
 // Directive to mark this component as a client component (runs in the browser)
 'use client';
 
+import Link from 'next/link';
 // Import the dynamic function from Next.js for code splitting and lazy loading
 import dynamic from 'next/dynamic';
 
@@ -98,6 +99,16 @@ export default function SignInPage() {
                   }
                 }}
               />
+            </div>
+
+            {/* Create account link — visible for users who don't have an account */}
+            <div className="text-center mt-6">
+              <p className="text-sm text-gray-600">
+                Don&apos;t have an account?{' '}
+                <Link href="/sign-up" className="text-indigo-600 hover:text-indigo-700 font-semibold">
+                  Create one
+                </Link>
+              </p>
             </div>
           </div>
         </div>

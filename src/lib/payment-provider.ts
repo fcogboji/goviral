@@ -19,12 +19,9 @@ export interface CurrencyConfig {
   priceSuffix: string;
 }
 
+// Only Nigeria sees Naira; all other countries see USD
 const CURRENCY_MAP: Record<string, CurrencyConfig> = {
   NG: { code: 'NGN', symbol: '₦', locale: 'en-NG', priceSuffix: 'NGN' },
-  GH: { code: 'NGN', symbol: '₦', locale: 'en-NG', priceSuffix: 'NGN' },
-  ZA: { code: 'NGN', symbol: '₦', locale: 'en-NG', priceSuffix: 'NGN' },
-  KE: { code: 'NGN', symbol: '₦', locale: 'en-NG', priceSuffix: 'NGN' },
-  GB: { code: 'GBP', symbol: '£', locale: 'en-GB', priceSuffix: 'GBP' },
 };
 
 const DEFAULT_CURRENCY: CurrencyConfig = {
@@ -67,15 +64,12 @@ export function getCountryFromHeaders(headers: Headers): string | null {
 
 /**
  * Map IANA timezones to ISO 3166-1 alpha-2 country codes.
- * Used as a client-side fallback when server headers aren't available (e.g. localhost).
+ * Used as client-side fallback when server headers aren't available.
+ * Nigeria only for NGN; others resolve to USD via getCurrencyForCountry.
  */
 const TIMEZONE_TO_COUNTRY: Record<string, string> = {
   'Africa/Lagos': 'NG',
   'Africa/Abuja': 'NG',
-  'Africa/Accra': 'GH',
-  'Africa/Johannesburg': 'ZA',
-  'Africa/Nairobi': 'KE',
-  'Europe/London': 'GB',
 };
 
 export function getCountryFromTimezone(timezone: string): string | null {

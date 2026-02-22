@@ -11,6 +11,7 @@ import {
   isPaystackConfigured,
   type PaymentProvider,
 } from '@/lib/payment-provider';
+import { getAppUrl } from '@/lib/app-url';
 
 async function initPaystack(user: { id: string; email: string }, dbPlan: { id: string }, planName: string, planConfig: { price: number; priceNGN?: number }) {
   const paystack = new PaystackAPI();
@@ -20,14 +21,14 @@ async function initPaystack(user: { id: string; email: string }, dbPlan: { id: s
     email: user.email,
     amount: 100, // $1 in cents for card authorization
     reference,
-    callback_url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/trial-callback`,
+    callback_url: `${getAppUrl()}/payment/trial-callback`,
     metadata: {
       userId: user.id,
       planId: dbPlan.id,
       planName,
       isTrial: true,
       fullAmount: (planConfig.priceNGN ?? planConfig.price * 1500) * 100,
-      cancel_action: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
+      cancel_action: `${getAppUrl()}/pricing`,
     },
   });
 
@@ -61,8 +62,8 @@ async function initStripe(user: { id: string; email: string }, dbPlan: { id: str
     amount: amountInCents,
     currency: 'usd',
     customerEmail: user.email,
-    successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/payment/stripe-trial-callback?session_id={CHECKOUT_SESSION_ID}&plan=${planName}&user=${user.id}`,
-    cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/trial-signup?canceled=true`,
+    successUrl: `${getAppUrl()}/payment/stripe-trial-callback?session_id={CHECKOUT_SESSION_ID}&plan=${planName}&user=${user.id}`,
+    cancelUrl: `${getAppUrl()}/trial-signup?canceled=true`,
     metadata: {
       userId: user.id,
       planId: dbPlan.id,
