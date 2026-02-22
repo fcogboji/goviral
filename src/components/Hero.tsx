@@ -22,7 +22,7 @@ export default function Hero({ onStartTrial, onWatchDemo, isLoading }: HeroProps
   }, [words.length]);
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-gray-950 via-gray-900 to-indigo-950 pt-32 pb-20 lg:pt-40 lg:pb-32">
+    <section className="relative overflow-hidden bg-white pt-32 pb-20 lg:pt-40 lg:pb-32">
       {/* Animated background grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
       {/* Glow blobs */}
@@ -32,15 +32,15 @@ export default function Hero({ onStartTrial, onWatchDemo, isLoading }: HeroProps
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-4xl mx-auto">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-4 py-1.5 mb-8">
-            <Sparkles className="w-4 h-4 text-indigo-400" />
-            <span className="text-sm font-medium text-indigo-300">
+          <div className="inline-flex items-center gap-2 bg-indigo-100 border border-indigo-200 rounded-full px-4 py-1.5 mb-8">
+            <Sparkles className="w-4 h-4 text-indigo-600" />
+            <span className="text-sm font-medium text-indigo-600">
               AI-Powered Viral Content Engine
             </span>
           </div>
 
           {/* Main heading */}
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-white mb-6 leading-[1.1] tracking-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-black mb-6 leading-[1.1] tracking-tight">
             Don&apos;t Just Post.{' '}
             <br className="hidden sm:block" />
             Go{' '}
@@ -56,7 +56,7 @@ export default function Hero({ onStartTrial, onWatchDemo, isLoading }: HeroProps
           </h1>
 
           {/* Subheadline */}
-          <p className="text-lg sm:text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl text-gray-700 mb-10 max-w-2xl mx-auto leading-relaxed">
             Paste your draft. Our AI rewrites it into a scroll-stopping,
             share-worthy post — optimized for every platform. Then we post it
             everywhere with one click.
@@ -74,7 +74,7 @@ export default function Hero({ onStartTrial, onWatchDemo, isLoading }: HeroProps
             </button>
             <button
               onClick={onWatchDemo}
-              className="text-gray-300 px-8 py-4 rounded-xl text-lg font-semibold border border-gray-700 hover:border-gray-500 hover:text-white transition-all flex items-center justify-center gap-2"
+              className="text-gray-700 px-8 py-4 rounded-xl text-lg font-semibold border border-gray-300 hover:border-gray-500 hover:text-black transition-all flex items-center justify-center gap-2"
             >
               <Play className="w-5 h-5" /> See It In Action
             </button>
@@ -83,16 +83,16 @@ export default function Hero({ onStartTrial, onWatchDemo, isLoading }: HeroProps
           {/* Stat badges */}
           <div className="flex flex-wrap justify-center gap-6 sm:gap-10 text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-gray-400">Cancel anytime</span>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-gray-700">Cancel anytime</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-gray-400">7-day free trial</span>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-gray-700">7-day free trial</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-gray-400">6 platforms supported</span>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-gray-700">6 platforms supported</span>
             </div>
           </div>
         </div>
