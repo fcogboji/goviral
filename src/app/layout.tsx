@@ -4,7 +4,7 @@ import './globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
 import { Toaster } from 'sonner'
 import CookieConsent from '@/components/CookieConsent'
-
+import Script from "next/script";
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -22,6 +22,7 @@ export default function RootLayout({
       <html lang="en">
         <body className={inter.className}>
           {children}
+          <Script src="https://24-7concept-pew4inhis-friday-s-projects.vercel.app/api/embed" async data-bot-id="cmngeertx0005l7jxvn3pb70g" data-brand="goviral"></Script>
           <Toaster richColors position="top-right" closeButton />
           <CookieConsent />
         </body>
