@@ -15,7 +15,7 @@ export default function Loading() {
         {/* Loading text displayed below the spinner */}
         <p className="text-gray-600">Loading GoViral...</p>
       </div>
-      <script src="https://24-7concept.vercel.app/embed/widget.js" defer data-api-base="https://24-7concept.vercel.app" data-bot-id="cmnqf95eg0005hbw1eqwflk25" data-brand="govi"></script>
+      <script src="https://www.faztino.com/embed/widget.js" defer data-api-base="https://www.faztino.com" data-bot-id="cmoq0h7490003aaf5zniggxl2" data-brand="faztino"></script>
     </div>
   )
 }
