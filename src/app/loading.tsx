@@ -15,7 +15,7 @@ export default function Loading() {
         {/* Loading text displayed below the spinner */}
         <p className="text-gray-600">Loading GoViral...</p>
       </div>
-      <script src="https://www.faztino.com/embed/widget.js" defer data-api-base="https://www.faztino.com" data-bot-id="cmoq0h7490003aaf5zniggxl2" data-brand="faztino"></script>
+      <script src="https://www.faztino.com/embed/widget.js" defer data-api-base="https://www.faztino.com" data-bot-id="cmoq0uk4r0001m24brjs1yps4" data-brand="goviral"></script>
     </div>
   )
 }
